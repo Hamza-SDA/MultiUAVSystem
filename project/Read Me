@@ -1,0 +1,35 @@
+# Before launching ROS, make sure that you are sourced into .bashrc and have place the following at the end.
+# These next lines must be placed in you source file (your dirs might be different and you may need to alter these lines):
+
+source ~/catkin_ws/devel/setup.bash
+source ~/PX4-Autopilot/Tools/simulation/gazebo-classic/setup_gazebo.bash ~/PX4-Autopilot ~/PX4-Autopilot/build/px4_sitl_default
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:~/PX4-Autopilot
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:~/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic
+export GAZEBO_PLUGIN_PATH=$GAZEBO_PLUGIN_PATH:/usr/lib/x86_64-linux-gnu/gazebo-9/plugins
+
+# Source the file:
+
+home/.bashrc
+source .bashrc
+
+# Build the project
+
+# Launch Simulation environment in separate terminals
+
+roscore
+roslaunch mavros px4.launch fcu_url:="udp://:14540@127.0.0.1:14557"
+roslaunch px4 posix_sitl.launch
+
+# In a third terminal, run the python node script for basic offboard launch
+
+rosrun project single_node.py
+
+# OR this for CPP node script
+
+rosrun project startcpp_single
+
+# To run the multi-UAV simulation
+
+roslaunch project launchmultiUAVSim.launch
+
+# Remember to catkin build when changing files
