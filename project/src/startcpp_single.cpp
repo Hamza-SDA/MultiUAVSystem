@@ -70,27 +70,58 @@ int main(int argc, char **argv)
     
     ros::Time last_request = ros::Time::now();
     
-    // Flight Mission
-    while(ros::ok())
+    // Enabling Manual mode selection
+    while(ros::ok() && !current_state.armed)
+    {
+    	ROS_INFO("Requesting OFFBOARD mode");
+    	if( current_state.mode != "OFFBOARD" && (ros::Time::now() - last_request > ros::Duration(5.0)) )
+    	{
+    		ROS_INFO("You can now switch to OFFBOARD mode.");
+    		last_request = ros::Time::now();
+    	}
+    	else
+    	{
+    		if( current_state.mode == "OFFBOARD" )
+    		{
+    			ROS_INFO("Switched to OFFBOARD mode");
+
+    			if( !current_state.armed && (ros::Time::now() - last_request > ros::Duration(10.0)) )
+    			{
+    				ROS_INFO("Arming UAV");
+    				if( arming_client.call(arm_cmd) && arm_cmd.response.success )
+    				{
+    					ROS_INFO("UAV Armed");
+    				}
+    				last_request = ros::Time::now();
+    			}
+    		}
+    	}
+
+    	ros::spinOnce();
+    	rate.sleep();
+    }
+
+    // OFFBOARD Flight Mission
+    while(ros::ok() && current_state.armed && current_state.mode == "OFFBOARD")
     {
         // Setting mode to OFFBOARD if not already set
-        if( current_state.mode != "OFFBOARD" && (ros::Time::now() - last_request > ros::Duration(5.0)))
-        {
-            if( set_mode_client.call(offb_mode) && offb_mode.response.mode_sent)
-            {                ROS_INFO("Offboard enabled");            }
-            last_request = ros::Time::now();
-        }
-        
+        //if( current_state.mode != "OFFBOARD" && (ros::Time::now() - last_request > ros::Duration(5.0)))
+        //{
+        //    if( set_mode_client.call(offb_mode) && offb_mode.response.mode_sent)
+        //    {                ROS_INFO("Offboard enabled");            }
+        //    last_request = ros::Time::now();
+        //}
+
         // Arming drone if not already armed
-        if( !current_state.armed && (ros::Time::now() - last_request > ros::Duration(5.0)))
-        {
-            if( arming_client.call(arm_cmd) && arm_cmd.response.success)
-            {                    ROS_INFO("Vehicle armed");                }
-            mission_progress++;
-            ROS_INFO("Position Home");
-            last_request = ros::Time::now();
-        }
-        
+        //if( !current_state.armed && (ros::Time::now() - last_request > ros::Duration(5.0)))
+        //{
+        //    if( arming_client.call(arm_cmd) && arm_cmd.response.success)
+        //    {                    ROS_INFO("Vehicle armed");                }
+        //    mission_progress++;
+        //    ROS_INFO("Position Home");
+        //    last_request = ros::Time::now();
+        //}
+
         // Moving the drone based on altitude
         if( mission_progress == 1 && current_z < 2 && (ros::Time::now() - last_request > ros::Duration(10.0)))
         {
@@ -127,7 +158,7 @@ int main(int argc, char **argv)
             mission_progress++;
             ROS_INFO("Return to Home");
         }
-        
+
         // Landing
         if( mission_progress == 6 && current_z < 2 && (ros::Time::now() - last_request > ros::Duration(35.0)))
         {
@@ -137,9 +168,11 @@ int main(int argc, char **argv)
             break;
         }
 
+ 
+
         local_pos_pub.publish(pose);
         ROS_INFO("x = %.2f, y = %.2f, z = %.2f", current_x, current_y, current_z);
-        
+
         ros::spinOnce();
         rate.sleep();
     }
