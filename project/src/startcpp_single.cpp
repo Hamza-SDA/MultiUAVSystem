@@ -125,29 +125,29 @@ int main(int argc, char **argv)
         // Moving the drone based on altitude
         if( mission_progress == 1 && current_z < 2 && (ros::Time::now() - last_request > ros::Duration(10.0)))
         {
-            pose.pose.position.x = 2;
-            pose.pose.position.y = 2;
+            pose.pose.position.x = 0.5;
+            pose.pose.position.y = 0.5;
             mission_progress++;
             ROS_INFO("Position 1");
         }
         if( mission_progress == 2 && current_z < 2 && (ros::Time::now() - last_request > ros::Duration(15.0)))
         {
-            pose.pose.position.x = 2;
-            pose.pose.position.y = -2;
+            pose.pose.position.x = 0.5;
+            pose.pose.position.y = -0.5;
             mission_progress++;
             ROS_INFO("Position 2");
         }
         if( mission_progress == 3 && current_z < 2 && (ros::Time::now() - last_request > ros::Duration(20.0)))
         {
-            pose.pose.position.x = -2;
-            pose.pose.position.y = -2;
+            pose.pose.position.x = -0.5;
+            pose.pose.position.y = -0.5;
             mission_progress++;
             ROS_INFO("Position 3");
         }
         if( mission_progress == 4 && current_z < 2 && (ros::Time::now() - last_request > ros::Duration(25.0)))
         {
-            pose.pose.position.x = -2;
-            pose.pose.position.y = 2;
+            pose.pose.position.x = -0.5;
+            pose.pose.position.y = 0.5;
             mission_progress++;
             ROS_INFO("Position 4");
         }
@@ -159,7 +159,7 @@ int main(int argc, char **argv)
             ROS_INFO("Return to Home");
         }
 
-        // Landing
+        // Landing (NOT PROPER)
         if( mission_progress == 6 && current_z < 2 && (ros::Time::now() - last_request > ros::Duration(35.0)))
         {
             pose.pose.position.z = 0.5;
