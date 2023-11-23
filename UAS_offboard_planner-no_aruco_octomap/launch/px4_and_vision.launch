@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="use_nuc" default="" />
+  <arg name="config_yaml" default="$(find mavros)/launch/px4_config.yaml"/>
+  
+  <!-- This node will launch MAVROS -->
+  <include file="$(find uas_offboard_planner)/launch/px4.launch">
+    <arg name="use_nuc" value="$(arg use_nuc)" />
+    <arg name="config_yaml" value="$(arg config_yaml)"/>
+  </include>
+
+  <!-- This node will launch the node that bridges realsense-ros and MAVROS -->
+  <include file="$(find vision_to_mavros)/launch/t265_tf_to_mavros_rot.launch"/>
+
+</launch>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- This is the node file for the drone controller -->
+    <node pkg="uas_offboard_planner" type="drone2_controller" name="drone2_controller_node" output="screen">
+        <param name="fcu_url" value=""/>
+        <param name="gcs_url" value=""/>
+        
+        <param name="tgt_system" value="2"/>
+        <param name="tgt_component" value="1"/>
+    </node>
+
+</launch>

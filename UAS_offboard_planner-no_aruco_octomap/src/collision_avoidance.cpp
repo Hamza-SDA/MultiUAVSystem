@@ -1,9 +1,7 @@
 #include <ros/ros.h>
-#include <mavros_msgs/State.h>
 #include <cmath>
-#include <project/Drone_pos.h>
+#include <uas_offboard_planner/Drone_pos.h>
 
-ros::Subscriber state_sub;
 ros::Subscriber drone1_sub;
 ros::Subscriber drone2_sub;
 ros::Subscriber drone3_sub;
@@ -15,15 +13,8 @@ double d3_x, d3_y, d3_z;
 double d12, d23, d31;
 double d1_change, d2_change, d3_change;
 
-
-// Grabs the current state of UAV0
-mavros_msgs::State current_state;
-void state_cb(const mavros_msgs::State::ConstPtr& msg) {
-    current_state = *msg;
-}
-
-project::Drone_pos Drone_global_pos;
-void d1_pos_cb(const project::Drone_pos::ConstPtr& msg)
+uas_offboard_planner::Drone_pos Drone_global_pos;
+void d1_pos_cb(const uas_offboard_planner::Drone_pos::ConstPtr& msg)
 {
     // Drone 1 position
     d1_x = msg->d1_x;
@@ -34,7 +25,7 @@ void d1_pos_cb(const project::Drone_pos::ConstPtr& msg)
     
 }
 
-void d2_pos_cb(const project::Drone_pos::ConstPtr& msg)
+void d2_pos_cb(const uas_offboard_planner::Drone_pos::ConstPtr& msg)
 {
     // Drone 2 position
     d2_x = msg->d2_x;
@@ -45,7 +36,7 @@ void d2_pos_cb(const project::Drone_pos::ConstPtr& msg)
     
 }
 
-void d3_pos_cb(const project::Drone_pos::ConstPtr& msg)
+void d3_pos_cb(const uas_offboard_planner::Drone_pos::ConstPtr& msg)
 {
     // Drone 3 position
     d3_x = msg->d3_x;
@@ -61,13 +52,11 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "collision_avoidance");
     ros::NodeHandle nh;
     
-    state_sub = nh.subscribe<mavros_msgs::State>("/uav0/mavros/state", 10, state_cb);				// State Subscriber
-    
     // Subscribing to the global drone positions
-    drone1_sub = nh.subscribe<project::Drone_pos>("/uav0/drone_global_pos", 10, d1_pos_cb);
-    drone2_sub = nh.subscribe<project::Drone_pos>("/uav1/drone_global_pos", 10, d2_pos_cb);
-    drone3_sub = nh.subscribe<project::Drone_pos>("/uav2/drone_global_pos", 10, d3_pos_cb);
-    drone_change = nh.advertise<project::Drone_pos>("/drone_alt_change", 10);
+    drone1_sub = nh.subscribe<uas_offboard_planner::Drone_pos>("/uav0/drone_global_pos", 10, d1_pos_cb);
+    drone2_sub = nh.subscribe<uas_offboard_planner::Drone_pos>("/uav1/drone_global_pos", 10, d2_pos_cb);
+    drone3_sub = nh.subscribe<uas_offboard_planner::Drone_pos>("/uav2/drone_global_pos", 10, d3_pos_cb);
+    drone_change = nh.advertise<uas_offboard_planner::Drone_pos>("/drone_alt_change", 10);
     
     ros::Rate rate(20.0);
     
@@ -83,6 +72,7 @@ int main(int argc, char **argv)
     	d31 = std::sqrt(std::pow(d3_x - d1_x, 2) + std::pow(d3_y - d1_y, 2));
     	
     	
+    	// The rest of this code still applies to the OFFBOARD mode of the drones.
     	if (d12 > min_dist && d23 > min_dist && d31 > min_dist)
     	{
     	    d1_change = 2;
@@ -91,37 +81,37 @@ int main(int argc, char **argv)
     	}
     	if (d12 < min_dist && d23 < min_dist && d31 < min_dist)
     	{
-    	    d1_change = 2.5;
+    	    d1_change = 3;
     	    d2_change = 2;
-    	    d3_change = 1.5;
+    	    d3_change = 1;
     	}
     	if (d12 < min_dist)
     	{
-    	    d1_change = 2.5;
-    	    d2_change = 1.5;
+    	    d1_change = 3;
+    	    d2_change = 1;
     	    d3_change = 2;
     	}
     	if (d23 < min_dist)
     	{
     	    d1_change = 2;
-    	    d2_change = 2.5;
-    	    d3_change = 1.5;
+    	    d2_change = 3;
+    	    d3_change = 1;
     	}
     	if (d31 < min_dist)
     	{
-    	    d3_change = 2.5;
-    	    d1_change = 1.5;
+    	    d3_change = 3;
+    	    d1_change = 1;
     	    d2_change = 2;
     	}
-    	if (current_state.mode != "OFFBOARD")
-    	{
-    		d1_change = d1_z;
-    		d2_change = d1_change;
-    		d3_change = d1_change;
-    	}
+    	
+    	// Code here will be introduced here to be used when UAV0 is in position mode so the other drones will follow.
+    	// Psudo
+    	// If the state of UAV0 is not in OFFBOARD				// Need to introduce UAV0 state subscriber and callback.
+    	// 	The altitude of drone 2 and 3 will mimic drone 1.
+    	// end
     	
     	// Publishing the altitude adjustment for each drone
-    	project::Drone_pos altitude;
+    	uas_offboard_planner::Drone_pos altitude;
     	altitude.d1_change = d1_change;
     	altitude.d2_change = d2_change;
     	altitude.d3_change = d3_change;

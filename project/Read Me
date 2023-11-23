@@ -28,8 +28,35 @@ rosrun project single_node.py
 
 rosrun project startcpp_single
 
+
+
 # To run the multi-UAV simulation
 
 roslaunch project launchmultiUAVSim.launch
 
 # Remember to catkin build when changing files
+
+source /opt/ros/noetic/setup.bash
+
+
+######## Final versions
+
+# To run the new versions multi-UAV simulation
+
+# You can launch with specified launch files
+
+roslaunch project launchGazEnv.launch
+roslaunch project launchUAV0.launch
+roslaunch project launchUAV1.launch
+roslaunch project launchUAV2.launch
+
+# Or launching the UAVs with the condensed launch file with specifications on the uav_num as an argument
+# This launch also allows the user to enter the location of each UAV as an argument
+
+roslaunch project launchGazEnv.launch
+roslaunch project launchUAV.launch uav_num:=ID x_pos:=x y_pos:=y z_pos:=0
+
+# Where ID is the uav number from 0 to 2 and x, y, and z are the Gazebo positions. (z does not need to be set as it will always be set to 0 as default)
+
+# Note: you cannot rosrun the drone_controller.cpp because it requires the argument for the uav_num set in the launch file.
+

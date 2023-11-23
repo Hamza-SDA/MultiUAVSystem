@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Global args -->
+  <arg name="serial_port" default="ttyS5"/>
+  <arg name="baud_rate" default="921600"/>
+  <arg name="gcs_ip_addr" default="192.168.30.107"/>
+  <!-- MAVROS PX4 Args -->
+  <arg name="fcu_url" value="/dev/$(arg serial_port):$(arg baud_rate)" />
+  <arg name="gcs_url" value="udp://@$(arg gcs_ip_addr)" />
+  <arg name="tgt_system" default="1" />
+  <arg name="tgt_component" default="1" />
+  <arg name="log_output" default="screen" />
+  <arg name="fcu_protocol" default="v2.0" />
+  <arg name="respawn_mavros" default="true" />
+
+  <include file="$(find mavros)/launch/node.launch">
+    <arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
+    <arg name="config_yaml" value="$(find mavros)/launch/px4_config.yaml" />
+
+    <arg name="fcu_url" value="$(arg fcu_url)" />
+    <arg name="gcs_url" value="$(arg gcs_url)" />
+    <arg name="tgt_system" value="$(arg tgt_system)" />
+    <arg name="tgt_component" value="$(arg tgt_component)" />
+    <arg name="log_output" value="$(arg log_output)" />
+    <arg name="fcu_protocol" value="$(arg fcu_protocol)" />
+    <arg name="respawn_mavros" value="$(arg respawn_mavros)" />
+  </include>
+</launch>

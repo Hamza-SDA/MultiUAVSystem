@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+LAUNCH_ARGS=$@
+## NOTE: Invoke this script to use telemetry WiFi using a Companion Computer (CC) connected to PX4 using UART.
+## Requires ROS, MAVROS and uas_offboard_planner repository in CC to run.
+## Telemetry should be enabled for this. More info: https://docs.px4.io/master/en/companion_computer/pixhawk_companion.html
+##
+## You can create a shortcut in your local machine (laptop, desktop) with the following cli:
+## x-terminal-emulator --hold -e ssh <cc-username>@<cc-hostname> -t "rosrun uas_offboard_planner init_telemetry_wifi <optional roslaunch arg:=value>"
+
+## Declare script variables
+clientIP="${SSH_CLIENT%% *}"
+## Execute command
+roslaunch uas_offboard_planner telemetry_wifi.launch gcs_ip_addr:=$clientIP ${LAUNCH_ARGS}

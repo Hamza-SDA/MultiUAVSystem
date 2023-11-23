@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Define sequence filename (reading *.txt files from the 'parameters' folder) -->
+  <arg name="sequence_file" default="hover_20sec.txt"/>
+  <rosparam param="/flight_setup/sequence_file" subst_value="True">$(arg sequence_file)</rosparam>
+  <!-- Define setup conditions for your experiments (reading *.yaml from the 'config' folder) -->
+  <arg name="setup_config" default="default_dvp.yaml"/>
+  <rosparam command="load" file="$(find uas_offboard_planner)/config/$(arg setup_config)"/>
+
+  <!-- Launch offboard control node (no arguments required)-->
+  <node pkg="uas_offboard_planner" type="offboard_control" name="offboard_control" output="screen" respawn="false" respawn_delay="0" />
+</launch>

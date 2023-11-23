@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<launch>
+  
+  <arg name="use_nuc" default="" />
+  <arg name="uav_ID" default="" />
+  <arg name="vicon_object_name" default="Hamza" />
+  <arg name="config_yaml" default="$(find mavros)/launch/px4_config.yaml"/>
+  
+  <!-- UAV0 Group -->
+  <group ns="uav$(arg uav_ID)">
+  	
+  	<!-- This node will launch MAVROS -->
+  	<include file="$(find uas_offboard_planner)/launch/px4.launch">
+    		<arg name="use_nuc" value="$(arg use_nuc)" />
+    		<arg name="config_yaml" value="$(arg config_yaml)"/>
+            	<arg name="tgt_system" value="$(eval 1 + arg('uav_ID'))"/>
+  	</include>
+
+  	<!-- This node will launch the node that bridges vicon (optitrack) and MAVROS -->
+  	<include file="$(find uas_offboard_planner)/launch/optitrack/vrpn_opti.launch">
+    		<arg name="vicon_object_name" value="$(arg vicon_object_name)" />
+    		<arg name="uav_ID" value="$(arg uav_ID)"/>
+    		
+  	</include>
+  	
+  </group>
+
+</launch>

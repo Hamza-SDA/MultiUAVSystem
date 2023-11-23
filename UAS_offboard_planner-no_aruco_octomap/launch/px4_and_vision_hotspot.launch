@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- This node will launch MAVROS -->
+  <include file="$(find uas_offboard_planner)/launch/px4_hotspot.launch"/>
+
+  <!-- This node will launch the node that bridges realsense-ros and MAVROS -->
+  <include file="$(find vision_to_mavros)/launch/t265_tf_to_mavros_rtabmap.launch"/>
+
+</launch>

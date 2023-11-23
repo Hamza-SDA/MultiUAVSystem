@@ -17,6 +17,7 @@ double current_x;
 double current_y;
 double current_z;
 int mission_progress = 0;
+bool started;
 
 mavros_msgs::State current_state;
 void state_cb(const mavros_msgs::State::ConstPtr& msg) {
@@ -34,6 +35,7 @@ int main(int argc, char **argv)
     ROS_INFO("Initialization");
     ros::init(argc, argv, "startcpp_single");
     ros::NodeHandle nh;
+    started = false;
     
     // Establishing publishers and subscribers
     state_sub = nh.subscribe<mavros_msgs::State>("mavros/state", 10, state_cb);
@@ -43,8 +45,8 @@ int main(int argc, char **argv)
     arming_client = nh.serviceClient<mavros_msgs::CommandBool>("mavros/cmd/arming");
     set_mode_client = nh.serviceClient<mavros_msgs::SetMode>("/mavros/set_mode");
     
-    //the setpoint publishing rate MUST be faster than 20Hz
-    ros::Rate rate(20.0);
+    //the setpoint publishing rate MUST be faster than 5Hz
+    ros::Rate rate(5.0);
     
     // wait for FCU connection
     while(ros::ok() && !current_state.connected){
@@ -59,9 +61,17 @@ int main(int argc, char **argv)
     pose.pose.position.y = 0;
     pose.pose.position.z = 2;
     
+    // Sending some setpoints before mission start
+    for (int i = 100; ros::ok() && i > 0; --i)
+    {
+        local_pos_pub.publish(pose);
+        ros::spinOnce();
+        rate.sleep();
+    }
+    
     // Setting to "OFFBOARD" flight mode
     mavros_msgs::SetMode offb_mode;
-    offb_mode.request.base_mode = 0;
+    // offb_mode.request.base_mode = 0;
     offb_mode.request.custom_mode = "OFFBOARD";
     
     // Arming drone
@@ -73,8 +83,7 @@ int main(int argc, char **argv)
     // Enabling Manual mode selection
     while(ros::ok() && !current_state.armed)
     {
-    	ROS_INFO("Requesting OFFBOARD mode");
-    	if( current_state.mode != "OFFBOARD" && (ros::Time::now() - last_request > ros::Duration(5.0)) )
+    	if( current_state.mode != "OFFBOARD" && (ros::Time::now() - last_request > ros::Duration(1.0)) )
     	{
     		ROS_INFO("You can now switch to OFFBOARD mode.");
     		last_request = ros::Time::now();
@@ -85,7 +94,7 @@ int main(int argc, char **argv)
     		{
     			ROS_INFO("Switched to OFFBOARD mode");
 
-    			if( !current_state.armed && (ros::Time::now() - last_request > ros::Duration(10.0)) )
+    			if( !current_state.armed && (ros::Time::now() - last_request > ros::Duration(3.0)) )
     			{
     				ROS_INFO("Arming UAV");
     				if( arming_client.call(arm_cmd) && arm_cmd.response.success )
@@ -97,10 +106,14 @@ int main(int argc, char **argv)
     		}
     	}
 
+        local_pos_pub.publish(pose);
+
     	ros::spinOnce();
     	rate.sleep();
     }
-
+    
+    started = true;
+    
     // OFFBOARD Flight Mission
     while(ros::ok() && current_state.armed && current_state.mode == "OFFBOARD")
     {
@@ -111,7 +124,7 @@ int main(int argc, char **argv)
         //    {                ROS_INFO("Offboard enabled");            }
         //    last_request = ros::Time::now();
         //}
-
+        
         // Arming drone if not already armed
         //if( !current_state.armed && (ros::Time::now() - last_request > ros::Duration(5.0)))
         //{
@@ -121,7 +134,14 @@ int main(int argc, char **argv)
         //    ROS_INFO("Position Home");
         //    last_request = ros::Time::now();
         //}
-
+        
+        // Starting mission param
+        if(started==true)
+        {
+            mission_progress = 1;
+            started = false;
+        }   
+        
         // Moving the drone based on altitude
         if( mission_progress == 1 && current_z < 2 && (ros::Time::now() - last_request > ros::Duration(10.0)))
         {
@@ -158,7 +178,7 @@ int main(int argc, char **argv)
             mission_progress++;
             ROS_INFO("Return to Home");
         }
-
+        
         // Landing (NOT PROPER)
         if( mission_progress == 6 && current_z < 2 && (ros::Time::now() - last_request > ros::Duration(35.0)))
         {
@@ -168,11 +188,9 @@ int main(int argc, char **argv)
             break;
         }
 
- 
-
         local_pos_pub.publish(pose);
         ROS_INFO("x = %.2f, y = %.2f, z = %.2f", current_x, current_y, current_z);
-
+        
         ros::spinOnce();
         rate.sleep();
     }

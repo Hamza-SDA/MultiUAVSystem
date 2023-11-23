@@ -20,12 +20,16 @@
         <arg name="paused" value="$(arg paused)"/>
     </include>
     
+    
+    
     <!-- UAV0 -->
     <group ns="uav0">
     
         <!-- MAVROS and vehicle configs -->
         <arg name="ID" value="0"/>
         <arg name="fcu_url" default="udp://:14540@localhost:14580"/>
+        
+        <!-- Changing the GPS position (Will affect QGC location) -->
         <arg name="mavros/global_position/global/latitude" value="-27.415"/>
         <arg name="mavros/global_position/global/longitude" value="153.1"/>
         <arg name="mavros/global_position/global/altitude" value="0"/>
@@ -33,7 +37,7 @@
         <!-- PX4 SITL and vehicle spawn -->
         <include file="$(find px4)/launch/single_vehicle_spawn.launch">
         
-            <arg name="x" value="-3"/>
+            <arg name="x" value="-2"/>
             <arg name="y" value="1"/>
             <arg name="z" value="0"/>
             
@@ -61,7 +65,7 @@
             <param name="fcu_url" value="$(arg fcu_url)"/>
             <param name="gcs_url" value=""/>
             
-            <param name="init_x" value="-3"/>
+            <param name="init_x" value="-2"/>
             <param name="init_y" value="1"/>
             <param name="init_z" value="0"/>
             
@@ -69,6 +73,8 @@
             <param name="tgt_component" value="1"/>
         </node>
     </group>
+    
+    
     
     <!-- UAV1 -->
     <group ns="uav1">
@@ -80,8 +86,8 @@
         <!-- PX4 SITL and vehicle spawn -->
         <include file="$(find px4)/launch/single_vehicle_spawn.launch">
         
-            <arg name="x" value="-3"/>
-            <arg name="y" value="-1"/>
+            <arg name="x" value="-2"/>
+            <arg name="y" value="-3"/>
             <arg name="z" value="0"/>
             
             <arg name="R" value="0"/>
@@ -108,14 +114,16 @@
             <param name="fcu_url" value="$(arg fcu_url)"/>
             <param name="gcs_url" value=""/>
             
-            <param name="init_x" value="-3"/>
-            <param name="init_y" value="-1"/>
+            <param name="init_x" value="-2"/>
+            <param name="init_y" value="-3"/>
             <param name="init_z" value="0"/>
             
             <param name="tgt_system" value="$(eval 1 + arg('ID'))"/>
             <param name="tgt_component" value="1"/>
         </node>
     </group>
+    
+    
     
     <!-- UAV2 -->
     <group ns="uav2">
@@ -127,7 +135,7 @@
         <!-- PX4 SITL and vehicle spawn -->
         <include file="$(find px4)/launch/single_vehicle_spawn.launch">
         
-            <arg name="x" value="0"/>
+            <arg name="x" value="1"/>
             <arg name="y" value="2"/>
             <arg name="z" value="0"/>
             
@@ -155,7 +163,7 @@
             <param name="fcu_url" value="$(arg fcu_url)"/>
             <param name="gcs_url" value=""/>
             
-            <param name="init_x" value="0"/>
+            <param name="init_x" value="1"/>
             <param name="init_y" value="2"/>
             <param name="init_z" value="0"/>
             
@@ -164,7 +172,8 @@
         </node>
     </group>
     
-    <node pkg="project" type="drone_tracker" name="drone_tracker_node" output="screen"/>
+    
+    
     <node pkg="project" type="collision_avoidance" name="collision_avoidance_node" output="screen"/>
 </launch>
 

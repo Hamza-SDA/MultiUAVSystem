@@ -1,0 +1,10 @@
+---
+float64 uav_x
+float64 uav_y
+float64 uav_z
+bool obstacle
+bool targetFound 
+float64 targetX 
+float64 targetY 
+float64 targetZ 
+float64 targetHeading 

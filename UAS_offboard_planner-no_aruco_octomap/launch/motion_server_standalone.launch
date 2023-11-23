@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- Global flags -->
+	<arg name="mot_srv_cfg" default="$(find uas_offboard_planner)/config/default_dvp.yaml"/>
+
+	<!-- Launch motion server standalone -->
+	<rosparam command="load" file="$(arg mot_srv_cfg)"/>
+	<node pkg="uas_offboard_planner" type="motion_srv_node" name="motion_srv_node" output="screen" respawn="false" respawn_delay="0" />
+	
+</launch>

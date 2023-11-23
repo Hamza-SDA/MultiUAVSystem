@@ -1,0 +1,25 @@
+# This file stores ROS params of the flight setup.
+
+flight_setup:
+  # Lower and Upper boundaries in metres (local position).
+  limit_x:
+    min: -2.5
+    max: 2.5
+  limit_y:
+    min: -2.5
+    max: 2.5
+  limit_z:
+    min: 0.4
+    max: 2.5
+
+  # Publishing Frequency in Hz.
+  offboard_freq: 20.0
+
+  # Local takeoff altitude (in metres) before broadcasting initial waypoint.
+  takeoff_altitude: 1.5
+  # Position tolerance (in metres) between actual UAV position and next
+  # position waypoint.
+  waypoint_error: 0.25
+
+  # Local UAV pose topic to subscribe.
+  pose_topic: "/mavros/local_position/pose"

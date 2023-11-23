@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <arg name="uav_ID" default=""/>
+
+    <!-- This is the node file for the drone controller -->
+    <node pkg="uas_offboard_planner" type="drone_controller" name="drone$(arg uav_ID)_controller_node" output="screen" args="$(arg uav_ID)">
+        <param name="fcu_url" value=""/>
+        <param name="gcs_url" value=""/>
+        
+        <param name="tgt_system" value="$(eval 1 + arg('uav_ID'))"/>
+        <param name="tgt_component" value="1"/>
+    </node>
+
+</launch>
